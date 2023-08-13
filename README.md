@@ -129,3 +129,4 @@ And my mqtt.yaml file :
   - name: borrowell_account_mortgage
     state_topic: "borrowell/accounts/Undisclosed Mortgage Provider_10"
     unique_id: "borrowell_account_mortgage"
+```

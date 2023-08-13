@@ -8,15 +8,19 @@ it srapes https://app.borrowell.com/#/credit-factors for the credit scrore and t
 
 
 # Pre-requisite
-Go to https://app.borrowell.com and create an account.
+Go to https://app.borrowell.com and create an account
 
 
-# Executing.
+# Executing
 
 You can either execute it manually with python or run it in a docker
 
 ## Command line
 pip install -r requirements.txt
+
+You also need to install firefox and GeckoDriver.
+The version of firefox and GeckoDriver needs to match.  Check the docker ENV variables to see which version it uses.
+
 python .\getCreditData.py --MQTT_URL localhost --MQTT_PORT 1883 --MQTT_USER my_mqtt_user --MQTT_PASSWORD my_mqtt_password --WEB_USER my_borrowell_user --WEB_PASSWORD my_borrowell_password --MYTIMEZONE America/Montreal
 
 
@@ -62,3 +66,64 @@ mqtt: !include mqtt.yaml
 ...
 ```
 
+And my mqtt.yaml file : 
+```
+########################################################
+##
+##  C R E D I T 
+##
+##  Borrowell
+##
+########################################################
+
+## BORROWELL
+  - name: borrowell_credit_score
+    state_topic: "borrowell/credit_score"
+    unique_id: "borrowell_credit_score"
+
+  - name: borrowell_credit_score_maj
+    state_topic: "borrowell/date_maj"
+    unique_id: "borrowell_credit_score_maj"
+
+
+### Factors
+  - name: borrowell_factor_missed_payments
+    state_topic: "borrowell/factors/Missed payments"
+    unique_id: "borrowell_factor_missed_payments"
+
+  - name: borrowell_factor_credit_utilization
+    state_topic: "borrowell/factors/Credit utilization"
+    unique_id: "borrowell_factor_credit_utilization"
+    
+  - name: borrowell_factor_derogatory_marks
+    state_topic: "borrowell/factors/Derogatory marks"
+    unique_id: "borrowell_factor_derogatory_marks"
+
+  - name: borrowell_factor_credit_age
+    state_topic: "borrowell/factors/Avg. credit age"
+    unique_id: "borrowell_factor_credit_age"
+
+  - name: borrowell_factor_total_accounts
+    state_topic: "borrowell/factors/Total accounts"
+    unique_id: "borrowell_factor_total_accounts"
+
+  - name: borrowell_factor_hard_inquiries
+    state_topic: "borrowell/factors/Hard inquiries"
+    unique_id: "borrowell_factor_hard_inquiries"
+
+### Accounts
+  - name: borrowell_account_tangerine
+    state_topic: "borrowell/accounts/TANGERINE_0"
+    unique_id: "borrowell_account_tangerine"
+
+  - name: borrowell_account_pc_optimum
+    state_topic: "borrowell/accounts/PRESIDENTS CHOICE MC_1"
+    unique_id: "borrowell_account_pc_optimum"
+
+  - name: borrowell_account_bmo_auto
+    state_topic: "borrowell/accounts/BMO 1111_2"
+    unique_id: "borrowell_account_bmo_auto"
+
+  - name: borrowell_account_mortgage
+    state_topic: "borrowell/accounts/Undisclosed Mortgage Provider_10"
+    unique_id: "borrowell_account_mortgage"

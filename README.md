@@ -115,18 +115,11 @@ And my mqtt.yaml file :
 
 ### Accounts
   - name: borrowell_account_tangerine
-    state_topic: "borrowell/accounts/TANGERINE_0"
-    unique_id: "borrowell_account_tangerine"
+    state_topic: "borrowell/accounts/CCNAME_0"
+    unique_id: "borrowell_account_cc_one"
 
   - name: borrowell_account_pc_optimum
-    state_topic: "borrowell/accounts/PRESIDENTS CHOICE MC_1"
-    unique_id: "borrowell_account_pc_optimum"
+    state_topic: "borrowell/accounts/OTHERCCNAME_1"
+    unique_id: "borrowell_account_cc_two"
 
-  - name: borrowell_account_bmo_auto
-    state_topic: "borrowell/accounts/BMO 1111_2"
-    unique_id: "borrowell_account_bmo_auto"
-
-  - name: borrowell_account_mortgage
-    state_topic: "borrowell/accounts/Undisclosed Mortgage Provider_10"
-    unique_id: "borrowell_account_mortgage"
 ```

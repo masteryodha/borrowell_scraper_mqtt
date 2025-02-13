@@ -185,7 +185,7 @@ if __name__ == '__main__':
     print("")
     print("")
     print("------------------------------------------------------------------------------------------")
-    schedule.every(70).hours.do(_getDataFromWebsite, username = args.WEB_USER, password = args.WEB_PASSWORD, headless = True)
+    schedule.every(24).hours.do(_getDataFromWebsite, username = args.WEB_USER, password = args.WEB_PASSWORD, headless = True)
     print("Scheduled the BORROWELL scraper every 70 hours from now")
     schedule.every(1).hours.do(_printHearbeat)
     print("Scheduled Heartbeat every 1 hour from now")

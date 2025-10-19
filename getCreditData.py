@@ -13,6 +13,9 @@ import datetime
 
 client = mqttClient.Client()
 
+INITIAL_WAIT_IN_SECONDS = 15
+WAIT_AFTER_LOGIN_IN_SECONDS = 15
+
 #Se connecter sur MQTT
 def _on_connect_mqtt(client, userdata, flags, rc):
     print('MQTT CONNECT - CONNACK received with code %d.' % (rc))
@@ -31,25 +34,26 @@ def _login(driver, username: str, password: str):
     driver.get(url)
     
     #Attendre que le site load complètement.
-    print('Wait for 45 seconds, the site is really slow')
-    time.sleep(45)
+    print('Wait for {} seconds, the site is really slow'.format(INITIAL_WAIT_IN_SECONDS))
+    time.sleep(INITIAL_WAIT_IN_SECONDS)
 
     #Pour une raison weird, le site change entre username et emailAddress parfois.  On le gère donc avec une exception
-    elem=driver.find_element(By.NAME, "Email")
+    print("Set username and password")
+    elem=driver.find_element(By.NAME, "username")
     elem.send_keys(username)
        
-    elem = driver.find_element(By.NAME, "Password")
+    elem = driver.find_element(By.NAME, "password")
     elem.send_keys(password)
     
     elem.send_keys(Keys.RETURN)
 
     #Wait for the login to happen
-    print('Waiting 15 more secondes for the login to complete...')
-    time.sleep(15)
+    print('Waiting {} more secondes for the login to complete...'.format(WAIT_AFTER_LOGIN_IN_SECONDS))
+    time.sleep(WAIT_AFTER_LOGIN_IN_SECONDS)
     print('*** Login successful ***')
 
 
-def _getCreditFactors(driver):
+def _getCreditFactors(driver, args):
     url = "https://app.borrowell.com/#/credit-factors"
     print('Get credit score and factors from {}'.format(url))
 
@@ -127,7 +131,7 @@ def _getAccounts(driver):
 
 
 
-def _getDataFromWebsite (username: str, password: str, headless: bool):
+def getDataFromWebsite (username: str, password: str, headless: bool, args):
     options = Options()
     
     if (os.environ.get('PLATFORM')) == "docker":
@@ -146,52 +150,9 @@ def _getDataFromWebsite (username: str, password: str, headless: bool):
     _connectToMQTT(args.MQTT_URL, int(args.MQTT_PORT), args.MQTT_USER, args.MQTT_PASSWORD)
 
     _login(driver, username, password)
-    _getCreditFactors(driver)
+    _getCreditFactors(driver, args)
     _getAccounts(driver)
     
     driver.close()
     client.disconnect()
 
-def _printHearbeat():
-    print("The cron in {} is still alive and python is working...".format(os.environ.get('PLATFORM')))
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Scrape Borrowell website to get credit scores and factor')
-    parser.add_argument('--MQTT_URL', dest='MQTT_URL', default=os.environ.get('MQTT_URL'))
-    parser.add_argument('--MQTT_PORT', dest='MQTT_PORT', default=os.environ.get('MQTT_PORT'))
-    parser.add_argument('--MQTT_USER', dest='MQTT_USER', default=os.environ.get('MQTT_USER'))
-    parser.add_argument('--MQTT_PASSWORD', dest='MQTT_PASSWORD', default=os.environ.get('MQTT_PASSWORD'))
-    parser.add_argument('--WEB_USER', dest='WEB_USER', default=os.environ.get('WEB_USER'))
-    parser.add_argument('--WEB_PASSWORD', dest='WEB_PASSWORD', default=os.environ.get('WEB_PASSWORD'))
-    parser.add_argument('--MYTIMEZONE', dest='MYTIMEZONE', default=os.environ.get('MYTIMEZONE'))
-
-    args = parser.parse_args()
-
-    print('***** ARGUMENTS BORROWELL *****')
-    print('* MQTT_URL      : {}'.format(args.MQTT_URL))
-    print('* MQTT_PORT     : {}'.format(args.MQTT_PORT))
-    print('* MQTT_USER     : {}'.format(args.MQTT_USER))
-    print('* MQTT_PASSWORD : {}'.format(args.MQTT_PASSWORD))
-    print('* WEB_USER      : {}'.format(args.WEB_USER))
-    print('* WEB_PASSWORD  : {}'.format(args.WEB_PASSWORD[0:3]))
-    print('* MYTIMEZONE    : {}*******'.format(args.MYTIMEZONE))
-    print('*******************************')
-    print('')
-
-
-    print("Run the BORROWELL scraper now")
-    _getDataFromWebsite(username = args.WEB_USER, password = args.WEB_PASSWORD, headless = True)
-
-    print("")
-    print("")
-    print("------------------------------------------------------------------------------------------")
-    schedule.every(24).hours.do(_getDataFromWebsite, username = args.WEB_USER, password = args.WEB_PASSWORD, headless = True)
-    print("Scheduled the BORROWELL scraper every 70 hours from now")
-    schedule.every(1).hours.do(_printHearbeat)
-    print("Scheduled Heartbeat every 1 hour from now")
-    print("------------------------------------------------------------------------------------------")
-    print("")
-    
-    while True:
-        schedule.run_pending()
-        time.sleep(1)

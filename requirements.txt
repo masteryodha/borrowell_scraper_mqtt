@@ -2,3 +2,4 @@ selenium
 paho-mqtt
 schedule
 pytz
+bottle

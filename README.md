@@ -33,12 +33,6 @@ docker build -t credit-borrowell .
 
 or you can user the one already build on dockerhub : https://hub.docker.com/repository/docker/mikamap/credit-borrowell
 
-## Docker
-Build the docker
-```
-docker build -t credit-borrowell .
-```
-
 Parameters : 
 | Parameters | Mandatory |  Description |
 |:-----|:--------:|:--------:|

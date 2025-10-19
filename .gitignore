@@ -2,3 +2,4 @@ geckodriver.log
 geckodriver.exe
 geckodriver
 secret_command
+__pycache__/

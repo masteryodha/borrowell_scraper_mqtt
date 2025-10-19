@@ -70,4 +70,4 @@ def get():
 def get(mqtt_url, mqtt_port, mqtt_user, mqtt_pwd, web_user, web_pwd):
     _getItOnWithCustomProperties(mqtt_url, mqtt_port, mqtt_user, mqtt_pwd, web_user, web_pwd)
 
-run(host='192.168.3.200', port=8080, debug=True)
+run(host='0.0.0.0', port=8080, debug=True)

@@ -10,15 +10,23 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
 import paho.mqtt.client as mqttClient
 import datetime
+import logging
 
-client = mqttClient.Client()
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+
+client = mqttClient.Client(
+    #protocol=mqttClient.MQTTv311,
+    #userdata=None,
+    #transport="tcp",
+    callback_api_version=mqttClient.CallbackAPIVersion.VERSION2
+)
 
 INITIAL_WAIT_IN_SECONDS = 15
 WAIT_AFTER_LOGIN_IN_SECONDS = 15
 
 #Se connecter sur MQTT
-def _on_connect_mqtt(client, userdata, flags, rc):
-    print('MQTT CONNECT - CONNACK received with code %d.' % (rc))
+def _on_connect_mqtt(client, userdata, flags, reasonCode, properties):
+    logging.info('MQTT CONNECT - CONNACK received with code {}.'.format(reasonCode))
 
 def _connectToMQTT (mqtt_address, mqtt_port, mqtt_user, mqtt_password):
     
@@ -28,17 +36,17 @@ def _connectToMQTT (mqtt_address, mqtt_port, mqtt_user, mqtt_password):
     client.loop_start()
 
 def _login(driver, username: str, password: str):
-    print('login...')
+    logging.info('login...')
     url = "https://app.borrowell.com/"
 
     driver.get(url)
     
     #Attendre que le site load complètement.
-    print('Wait for {} seconds, the site is really slow'.format(INITIAL_WAIT_IN_SECONDS))
+    logging.info('Wait for {} seconds, the site is really slow'.format(INITIAL_WAIT_IN_SECONDS))
     time.sleep(INITIAL_WAIT_IN_SECONDS)
 
     #Pour une raison weird, le site change entre username et emailAddress parfois.  On le gère donc avec une exception
-    print("Set username and password")
+    logging.info("Set username and password")
     elem=driver.find_element(By.NAME, "username")
     elem.send_keys(username)
        
@@ -48,14 +56,27 @@ def _login(driver, username: str, password: str):
     elem.send_keys(Keys.RETURN)
 
     #Wait for the login to happen
-    print('Waiting {} more secondes for the login to complete...'.format(WAIT_AFTER_LOGIN_IN_SECONDS))
+    logging.info('Waiting {} more secondes for the login to complete...'.format(WAIT_AFTER_LOGIN_IN_SECONDS))
     time.sleep(WAIT_AFTER_LOGIN_IN_SECONDS)
-    print('*** Login successful ***')
+    logging.info('*** Login successful ***')
+
+def _printArguments(args):
+    logging.info('***** ARGUMENTS BORROWELL *****')
+    logging.info('* MQTT_URL      : {}'.format(args['MQTT_URL']))
+    logging.info('* MQTT_PORT     : {}'.format(args['MQTT_PORT']))
+    logging.info('* MQTT_USER     : {}'.format(args['MQTT_USER']))
+    logging.info('* MQTT_PASSWORD : {}*******'.format(args['MQTT_PASSWORD'][0:3]))
+    logging.info('* WEB_USER      : {}'.format(args['WEB_USER']))
+    logging.info('* WEB_PASSWORD  : {}*******'.format(args['WEB_PASSWORD'][0:3]))
+    logging.info('* MYTIMEZONE    : {}'.format(args['MYTIMEZONE']))
+    logging.info('*******************************')
+    logging.info('')
 
 
 def _getCreditFactors(driver, args):
+    
     url = "https://app.borrowell.com/#/credit-factors"
-    print('Get credit score and factors from {}'.format(url))
+    logging.info('Get credit score and factors from {}'.format(url))
 
     driver.get(url)
     
@@ -65,11 +86,11 @@ def _getCreditFactors(driver, args):
     #data-testid="credit-score-card-score"
     elem=driver.find_element(By.XPATH, "//span[@data-cy='credit-score-text']")
     credit_score = elem.get_attribute("innerHTML")
-    print('Credit Score from Equifax : {}'. format(credit_score))
+    logging.info('Credit Score from Equifax : {}'. format(credit_score))
     client.publish('borrowell/credit_score', credit_score, retain=True)
 
     #Publish the date also
-    client.publish('borrowell/date_maj', str(datetime.datetime.now(tz=pytz.timezone(args.MYTIMEZONE))), retain=True)
+    client.publish('borrowell/date_maj', str(datetime.datetime.now(tz=pytz.timezone(args['MYTIMEZONE']))), retain=True)
 
     #data-testid="credit-score-card-score"
     elems=driver.find_elements(By.CLASS_NAME, "factor-summary")
@@ -82,12 +103,12 @@ def _getCreditFactors(driver, args):
         value_elem = elem.find_element(By.CLASS_NAME, "factor-value")
         #print('Value : {}'.format(value_elem.get_attribute("innerHTML")))
         value = value_elem.get_attribute("innerHTML")
-        print('Factor : {}. Value : {}'.format(factor, value))
+        logging.info('Factor : {}. Value : {}'.format(factor, value))
         client.publish('borrowell/factors/{}'.format(factor), value, retain=True)
 
 def _getAccounts(driver):
     url = "https://app.borrowell.com/#/app/creditReport"
-    print('Get accounts from {}'.format(url))
+    logging.info('Get accounts from {}'.format(url))
 
     driver.get(url)
     
@@ -115,23 +136,25 @@ def _getAccounts(driver):
     for a in account_status_elems:
         account_status.append(a.get_attribute("innerHTML"))
 
-    print("{} accounts found".format(len(account_names)))
+    logging.info("{} accounts found".format(len(account_names)))
     for x in range(0, len(account_names)):
         my_account = account_names[x].strip()
         my_balance = account_balances[x].strip().replace('$', '')
         my_reported_date = account_reported_dates[x].strip().replace('Reported: ', '')
         my_status = account_status[x].strip()
         
-        print("Account : {}_{}.  Balance : {}.  Reported date : {}.  Status : {}".format(my_account, x, my_balance, my_reported_date, my_status))
+        logging.info("Account : {}_{}.  Balance : {}.  Reported date : {}.  Status : {}".format(my_account, x, my_balance, my_reported_date, my_status))
         if my_status == 'Open':
             #Addind the index as sometimes the account names are the same
-            print("Publishing to MQTT only Open account")
+            logging.info("Publishing to MQTT only Open account")
             client.publish('borrowell/accounts/{}_{}'.format(my_account, x), my_balance, retain=True)
             client.publish('borrowell/accounts/{}_{}_date'.format(my_account, x), my_reported_date, retain=True)
 
 
 
-def getDataFromWebsite (username: str, password: str, headless: bool, args):
+def getDataFromWebsite (args, headless: bool):
+    _printArguments(args)
+    
     options = Options()
     
     if (os.environ.get('PLATFORM')) == "docker":
@@ -146,13 +169,12 @@ def getDataFromWebsite (username: str, password: str, headless: bool, args):
 
     driver = webdriver.Firefox(options=options)
 
-    print('Connecting to MQTT')
-    _connectToMQTT(args.MQTT_URL, int(args.MQTT_PORT), args.MQTT_USER, args.MQTT_PASSWORD)
+    logging.info('Connecting to MQTT')
+    _connectToMQTT(args['MQTT_URL'], int(args['MQTT_PORT']), args['MQTT_USER'], args['MQTT_PASSWORD'])
 
-    _login(driver, username, password)
+    _login(driver, args['WEB_USER'], args['WEB_PASSWORD'])
     _getCreditFactors(driver, args)
     _getAccounts(driver)
     
     driver.close()
     client.disconnect()
-

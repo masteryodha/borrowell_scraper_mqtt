@@ -6,3 +6,4 @@ README.txt
 Dockerfile
 .dockerignore
 secret_command
+__pycache__

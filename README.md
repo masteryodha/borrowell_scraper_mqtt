@@ -117,3 +117,7 @@ And my mqtt.yaml file :
     unique_id: "borrowell_account_cc_two"
 
 ```
+
+# Appel rest
+
+we can directly call a rest endpoint to force the refresh with http://IP:8080/run-now

@@ -19,6 +19,7 @@ if __name__ == '__main__':
     parser.add_argument('--MYTIMEZONE', dest='MYTIMEZONE', default=os.environ.get('MYTIMEZONE'))
 
     args = parser.parse_args()
+    print(args)
 
     logging.info("Run the BORROWELL scraper now")
     getDataFromWebsite(args = args, headless = False)

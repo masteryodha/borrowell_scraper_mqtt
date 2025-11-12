@@ -61,14 +61,15 @@ def _login(driver, username: str, password: str):
     logging.info('*** Login successful ***')
 
 def _printArguments(args):
+
     logging.info('***** ARGUMENTS BORROWELL *****')
-    logging.info('* MQTT_URL      : {}'.format(args['MQTT_URL']))
-    logging.info('* MQTT_PORT     : {}'.format(args['MQTT_PORT']))
-    logging.info('* MQTT_USER     : {}'.format(args['MQTT_USER']))
-    logging.info('* MQTT_PASSWORD : {}*******'.format(args['MQTT_PASSWORD'][0:3]))
-    logging.info('* WEB_USER      : {}'.format(args['WEB_USER']))
-    logging.info('* WEB_PASSWORD  : {}*******'.format(args['WEB_PASSWORD'][0:3]))
-    logging.info('* MYTIMEZONE    : {}'.format(args['MYTIMEZONE']))
+    logging.info('* MQTT_URL      : {}'.format(args.MQTT_URL))
+    logging.info('* MQTT_PORT     : {}'.format(args.MQTT_PORT))
+    logging.info('* MQTT_USER     : {}'.format(args.MQTT_USER))
+    logging.info('* MQTT_PASSWORD : {}*******'.format(args.MQTT_PASSWORD[0:3]))
+    logging.info('* WEB_USER      : {}'.format(args.WEB_USER))
+    logging.info('* WEB_PASSWORD  : {}*******'.format(args.WEB_PASSWORD[0:3]))
+    logging.info('* MYTIMEZONE    : {}'.format(args.MYTIMEZONE))
     logging.info('*******************************')
     logging.info('')
 
@@ -90,7 +91,7 @@ def _getCreditFactors(driver, args):
     client.publish('borrowell/credit_score', credit_score, retain=True)
 
     #Publish the date also
-    client.publish('borrowell/date_maj', str(datetime.datetime.now(tz=pytz.timezone(args['MYTIMEZONE']))), retain=True)
+    client.publish('borrowell/date_maj', str(datetime.datetime.now(tz=pytz.timezone(args.MYTIMEZONE))), retain=True)
 
     #data-testid="credit-score-card-score"
     elems=driver.find_elements(By.CLASS_NAME, "factor-summary")
@@ -170,9 +171,9 @@ def getDataFromWebsite (args, headless: bool):
     driver = webdriver.Firefox(options=options)
 
     logging.info('Connecting to MQTT')
-    _connectToMQTT(args['MQTT_URL'], int(args['MQTT_PORT']), args['MQTT_USER'], args['MQTT_PASSWORD'])
+    _connectToMQTT(args.MQTT_URL, int(args.MQTT_PORT), args.MQTT_USER, args.MQTT_PASSWORD)
 
-    _login(driver, args['WEB_USER'], args['WEB_PASSWORD'])
+    _login(driver, args.WEB_USER, args.WEB_PASSWORD)
     _getCreditFactors(driver, args)
     _getAccounts(driver)
     

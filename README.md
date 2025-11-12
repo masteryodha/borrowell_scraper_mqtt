@@ -50,6 +50,16 @@ Run with :
 ```
 docker run -d --rm --name credit-borrowell -p 8080:8080 -e "MQTT_URL=localhost" -e "MQTT_PORT=1883" -e "MQTT_USER=my_mqtt_user" -e "MQTT_PASSWORD=my_mqtt_password" -e "WEB_USER=my_borrowell_user" -e "WEB_PASSWORD=my_borrowell_password" masteryodha/credit-borrowell 
 ```
+### Docker build and push to dockerhub
+
+Because i'm a noob and never remember what to do : 
+
+```
+docker login
+docker tag credit-borrowell:1.0 mikamap/credit-borrowell:1.0
+docker push mikamap/credit-borrowell:1.0
+```
+
 
 # Home Assistant
 

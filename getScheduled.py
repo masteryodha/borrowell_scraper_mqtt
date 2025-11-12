@@ -13,17 +13,26 @@ HEARTBEAT_FREQUENCY_IN_HOUR = 1
 SCHEDULE_GET_BOROWELL_IN_HOUR = 12
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
+class Argument:
+    def __init__(self, MQTT_URL, MQTT_PORT, MQTT_USER, MQTT_PASSWORD, WEB_USER, WEB_PASSWORD, MYTIMEZONE):
+        self.MQTT_URL = MQTT_URL
+        self.MQTT_PORT = MQTT_PORT
+        self.MQTT_USER = MQTT_USER
+        self.MQTT_PASSWORD = MQTT_PASSWORD
+        self.WEB_USER = WEB_USER
+        self.WEB_PASSWORD = WEB_PASSWORD
+        self.MYTIMEZONE = MYTIMEZONE
 
 #Arguments
-arguments = {
-    'MQTT_URL': os.environ.get('MQTT_URL'),
-    'MQTT_PORT': os.environ.get('MQTT_PORT'),
-    'MQTT_USER': os.environ.get('MQTT_USER'),
-    'MQTT_PASSWORD': os.environ.get('MQTT_PASSWORD'),
-    'WEB_USER': os.environ.get('WEB_USER'),
-    'WEB_PASSWORD': os.environ.get('WEB_PASSWORD'),
-    'MYTIMEZONE': os.environ.get('MYTIMEZONE'),
-}
+arguments = Argument(
+     MQTT_URL=os.environ.get('MQTT_URL'),
+     MQTT_PORT=os.environ.get('MQTT_PORT'),
+     MQTT_USER=os.environ.get('MQTT_USER'),
+     MQTT_PASSWORD=os.environ.get('MQTT_PASSWORD'),
+     WEB_USER=os.environ.get('WEB_USER'),
+     WEB_PASSWORD=os.environ.get('WEB_PASSWORD'),
+     MYTIMEZONE=os.environ.get('MYTIMEZONE')
+)
 
 def _printHearbeat():
     logging.info("The cron in {} is still alive and python is working...".format(os.environ.get('PLATFORM')))
@@ -33,6 +42,7 @@ def run_scheduled_tasks():
 
     #On va chercher les informations tout de suite
     logging.info("Aller chercher les informations de Borrowell Maintenant")
+    print(arguments.MQTT_URL)
     getDataFromWebsite(args=arguments, headless=True)
 
     logging.info("")

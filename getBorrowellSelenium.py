@@ -15,14 +15,11 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 client = mqttClient.Client(
-    #protocol=mqttClient.MQTTv311,
-    #userdata=None,
-    #transport="tcp",
     callback_api_version=mqttClient.CallbackAPIVersion.VERSION2
 )
 
-INITIAL_WAIT_IN_SECONDS = 15
-WAIT_AFTER_LOGIN_IN_SECONDS = 15
+INITIAL_WAIT_IN_SECONDS = 60
+WAIT_AFTER_LOGIN_IN_SECONDS = 60
 
 #Se connecter sur MQTT
 def _on_connect_mqtt(client, userdata, flags, reasonCode, properties):
@@ -46,8 +43,10 @@ def _login(driver, username: str, password: str):
     time.sleep(INITIAL_WAIT_IN_SECONDS)
 
     #Pour une raison weird, le site change entre username et emailAddress parfois.  On le gère donc avec une exception
-    logging.info("Set username and password")
+    logging.info("Set username ({}) and password".format(username))
     elem=driver.find_element(By.NAME, "username")
+    
+    logging.info(driver.page_source)
     elem.send_keys(username)
        
     elem = driver.find_element(By.NAME, "password")
@@ -163,10 +162,10 @@ def getDataFromWebsite (args, headless: bool):
     else :
         options.binary_location = r'C:\Program Files\Mozilla Firefox\firefox.exe'
 
-
     if (headless) :
-        #options.headless = True  #deprecated
         options.add_argument('-headless')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
 
     driver = webdriver.Firefox(options=options)
 

@@ -28,7 +28,7 @@ python .\getCreditData.py --MQTT_URL localhost --MQTT_PORT 1883 --MQTT_USER my_m
 ## Docker
 Build the docker from the clone repository
 ```
-docker build --no-cache -t mikamap/credit-borrowell .
+docker build --no-cache -t mikamap/credit-borrowell:1.2 .
 ```
 
 or you can use the one already build on dockerhub : https://hub.docker.com/repository/docker/mikamap/credit-borrowell
@@ -48,7 +48,7 @@ Parameters :
 
 Run with : 
 ```
-docker run -d --rm --name credit-borrowell -p 8080:8080 -e "MQTT_URL=localhost" -e "MQTT_PORT=1883" -e "MQTT_USER=my_mqtt_user" -e "MQTT_PASSWORD=my_mqtt_password" -e "WEB_USER=my_borrowell_user" -e "WEB_PASSWORD=my_borrowell_password" masteryodha/credit-borrowell 
+docker run -d --rm --name credit-borrowell -p 8080:8080 -e "MQTT_URL=localhost" -e "MQTT_PORT=1883" -e "MQTT_USER=my_mqtt_user" -e "MQTT_PASSWORD=my_mqtt_password" -e "WEB_USER=my_borrowell_user" -e "WEB_PASSWORD=my_borrowell_password" mikamap/credit-borrowell 
 ```
 ### Docker build and push to dockerhub
 
@@ -56,8 +56,7 @@ Because i'm a noob and never remember what to do :
 
 ```
 docker login
-docker tag credit-borrowell:1.0 mikamap/credit-borrowell:1.0
-docker push mikamap/credit-borrowell:1.0
+docker push mikamap/credit-borrowell:1.2
 ```
 
 

@@ -52,5 +52,5 @@ COPY . .
 EXPOSE 8080
 
 #-u is necessary to get logs of the python script in docker logs
-#CMD ["python3", "-u", "./getCreditData.py"]
+#CMD ["python3", "-u", "./getCreditBorrowell.py"]
 CMD ["python3", "-u", "./getScheduled.py"]

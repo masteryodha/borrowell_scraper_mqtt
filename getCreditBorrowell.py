@@ -1,6 +1,6 @@
 import os
 import argparse
-from getBorrowellSelenium import getDataFromWebsite
+from getBorrowellPlaywright import getDataFromWebsite
 import logging
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
@@ -21,4 +21,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     logging.info("Run the BORROWELL scraper now")
-    getDataFromWebsite(args = args, headless = False)
+    getDataFromWebsite(args = args, headless = True)

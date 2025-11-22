@@ -18,8 +18,7 @@ You can either execute it manually with python or run it in a docker
 ## Command line
 pip install -r requirements.txt
 
-You also need to install firefox and GeckoDriver.
-The version of firefox and GeckoDriver needs to match.  Check the docker ENV variables to see which version it uses.
+Since it's using playwright, after installing the python requirements, you need to install playwright : playwright install --with-deps
 
 python .\getCreditData.py --MQTT_URL localhost --MQTT_PORT 1883 --MQTT_USER my_mqtt_user --MQTT_PASSWORD my_mqtt_password --WEB_USER my_borrowell_user --WEB_PASSWORD my_borrowell_password --MYTIMEZONE America/Montreal
 
@@ -28,7 +27,7 @@ python .\getCreditData.py --MQTT_URL localhost --MQTT_PORT 1883 --MQTT_USER my_m
 ## Docker
 Build the docker from the clone repository
 ```
-docker build --no-cache -t mikamap/credit-borrowell:1.2 .
+docker build --no-cache -t mikamap/credit-borrowell:VERSION .
 ```
 
 or you can use the one already build on dockerhub : https://hub.docker.com/repository/docker/mikamap/credit-borrowell
@@ -56,7 +55,7 @@ Because i'm a noob and never remember what to do :
 
 ```
 docker login
-docker push mikamap/credit-borrowell:1.2
+docker push mikamap/credit-borrowell:1.X
 ```
 
 
@@ -89,32 +88,6 @@ And my mqtt.yaml file :
   - name: borrowell_credit_score_maj
     state_topic: "borrowell/date_maj"
     unique_id: "borrowell_credit_score_maj"
-
-
-### Factors
-  - name: borrowell_factor_missed_payments
-    state_topic: "borrowell/factors/Missed payments"
-    unique_id: "borrowell_factor_missed_payments"
-
-  - name: borrowell_factor_credit_utilization
-    state_topic: "borrowell/factors/Credit utilization"
-    unique_id: "borrowell_factor_credit_utilization"
-    
-  - name: borrowell_factor_derogatory_marks
-    state_topic: "borrowell/factors/Derogatory marks"
-    unique_id: "borrowell_factor_derogatory_marks"
-
-  - name: borrowell_factor_credit_age
-    state_topic: "borrowell/factors/Avg. credit age"
-    unique_id: "borrowell_factor_credit_age"
-
-  - name: borrowell_factor_total_accounts
-    state_topic: "borrowell/factors/Total accounts"
-    unique_id: "borrowell_factor_total_accounts"
-
-  - name: borrowell_factor_hard_inquiries
-    state_topic: "borrowell/factors/Hard inquiries"
-    unique_id: "borrowell_factor_hard_inquiries"
 
 ### Accounts
   - name: borrowell_account_tangerine

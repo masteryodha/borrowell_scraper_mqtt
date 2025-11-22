@@ -2,7 +2,7 @@ import time
 import os
 import schedule
 import threading
-from getBorrowellSelenium import getDataFromWebsite
+from getBorrowellPlaywright import getDataFromWebsite
 from flask import Flask, request, jsonify
 import logging
 

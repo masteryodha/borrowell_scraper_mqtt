@@ -36,7 +36,7 @@ def _login(page, username: str, password: str):
     #Pour une raison weird, le site change entre username et emailAddress parfois.  On le gère donc avec une exception
     logging.info("Set username ({}) and password".format(username))
     page.fill("input[name='username']", "jfa_@hotmail.com")
-    page.fill("input[name='password']", "XxkrKWoTefpxnB9VbVB6piWUi")
+    page.fill("input[name='password']", "***************")
     page.press("input[name='password']", "Enter")
     page.wait_for_selector("//span[contains(text(),'Jean Francois')]")
 
@@ -198,3 +198,4 @@ def getDataFromWebsite (args, headless: bool):
 
         browser.close()
         client.disconnect()
+
